@@ -21,6 +21,12 @@ namespace EventSphere.Data
                 .WithMany(a => a.Events)
                 .UsingEntity(j => j.ToTable("EventAttendees"));
 
+
+
+            Console.WriteLine("This should be a conflict");
+            modelBuilder.Entity<Ticket>();
+            Console.WriteLine("This should be a confldsaict");
+
         }
     }
 }
