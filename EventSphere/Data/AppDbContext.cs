@@ -1,9 +1,11 @@
 ﻿using EventSphere.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventSphere.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<IdentityUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -23,9 +25,13 @@ namespace EventSphere.Data
 
 
 
+            modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
+            modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
+            modelBuilder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+
+            modelBuilder.Entity<IdentityUserClaim<string>>().HasKey(c => c.Id);
+            modelBuilder.Entity<IdentityRoleClaim<string>>().HasKey(rc => rc.Id);
             Console.WriteLine("This should be a conflict");
-            modelBuilder.Entity<Ticket>();
-            Console.WriteLine("This should be a confldsaict");
 
         }
     }
