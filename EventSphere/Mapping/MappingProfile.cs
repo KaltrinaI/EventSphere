@@ -16,6 +16,17 @@ namespace EventSphere.Mapping
             CreateMap<Ticket, TicketDTO>();
             CreateMap<TicketRequestDTO, Ticket>();
             CreateMap<Ticket, TicketRequestDTO>();
+            CreateMap<AttendeeDTO, Attendee>();
+            CreateMap<Attendee, AttendeeDTO>();
+
+            CreateMap<EventDTO, Event>();
+            CreateMap<Event, EventDTO>();
+
+            CreateMap<EventRequestDTO, Event>();
+            CreateMap<Event, EventRequestDTO>();
+
+            CreateMap<AttendeeRequestDTO, Attendee>();
+            CreateMap<Attendee, AttendeeRequestDTO>();
         }
     }
 }
