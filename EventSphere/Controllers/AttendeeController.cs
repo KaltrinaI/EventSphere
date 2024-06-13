@@ -1,6 +1,7 @@
 ﻿using EventSphere.DTOs;
 using EventSphere.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EventSphere.Controllers
 {
@@ -9,25 +10,37 @@ namespace EventSphere.Controllers
     public class AttendeeController : ControllerBase
     {
         private readonly IAttendeeService _service;
+        private readonly IMemoryCache _memoryCache;
 
-        public AttendeeController(IAttendeeService service)
+        public AttendeeController(IAttendeeService service, IMemoryCache memoryCache)
         {
             _service = service;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AttendeeDTO>>> GetAllAttendees()
         {
+            if (_memoryCache.TryGetValue("AllAttendees", out IEnumerable<AttendeeDTO>? attendees))
+            {
+                return Ok(attendees);
+            }
+            
             var response = await _service.GetAllAttendees();
-
+            _memoryCache.Set("AllAttendees", response, TimeSpan.FromMinutes(10));
             return Ok(response);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<AttendeeDTO>> GetAttendeeById(int attendeeId)
         {
-            var events = await _service.GetAttendeeById( attendeeId);
-            return Ok(events);
+            if(_memoryCache.TryGetValue("attendee", out AttendeeDTO? attendee))
+            {
+                return Ok(attendee);
+            }
+            var response = await _service.GetAttendeeById( attendeeId);
+            _memoryCache.Set("attendee",response, TimeSpan.FromMinutes(10));
+            return Ok(response);
         }
 
         [HttpPost]
@@ -53,8 +66,13 @@ namespace EventSphere.Controllers
         [HttpGet("{eventId}")]
         public async Task<ActionResult<IEnumerable<AttendeeDTO>>> GetAttendeesByEvent(int eventId)
         {
-            var tickets = await _service.GetAttendeesByEvent(eventId);
-            return Ok(tickets);
+            if(_memoryCache.TryGetValue("attendeesByEvent", out IEnumerable<AttendeeDTO>? attendeeList))
+            {
+                return Ok(attendeeList);
+            }
+            var response = await _service.GetAttendeesByEvent(eventId);
+            _memoryCache.Set("attendeesByEvent", response, TimeSpan.FromMinutes(10));
+            return Ok(response);
 
         }
     }

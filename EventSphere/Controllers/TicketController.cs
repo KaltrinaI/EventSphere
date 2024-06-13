@@ -1,6 +1,7 @@
 ﻿using EventSphere.DTOs;
 using EventSphere.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EventSphere.Controllers
 {
@@ -9,22 +10,41 @@ namespace EventSphere.Controllers
     public class TicketController : ControllerBase
     {
         private readonly ITicketService _ticketService;
-        public TicketController(ITicketService ticketService)
+        private readonly IMemoryCache _memoryCache;
+        public TicketController(ITicketService ticketService, IMemoryCache memoryCache)
         {
             _ticketService = ticketService;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<TicketDTO>> GetTicketById(int id)
         {
-            var ticket = await _ticketService.GetTicketById(id);
-            return Ok(ticket);
+            try
+            {
+                if (_memoryCache.TryGetValue("ticketById", out TicketDTO? ticketById))
+                {
+                    return Ok(ticketById);
+                }
+                var ticket = await _ticketService.GetTicketById(id);
+                _memoryCache.Set("ticketById", ticket, TimeSpan.FromMinutes(10));
+                return Ok(ticket);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Ticket not found" });
+            }
         }
 
         [HttpGet("{eventId}")]
         public async Task<ActionResult<IEnumerable<TicketDTO>>> GetTicketsByEventId(int eventId)
         {
+            if(_memoryCache.TryGetValue("ticketsByEvent", out IEnumerable<TicketDTO>? ticketList))
+            {
+                return Ok(ticketList);
+            }
             var tickets = await _ticketService.GetTicketsByEventId(eventId);
+            _memoryCache.Set("ticketsByEvent",tickets, TimeSpan.FromMinutes(10));
             return Ok(tickets);
 
         }
@@ -46,7 +66,12 @@ namespace EventSphere.Controllers
         [HttpGet("{eventId}/available")]
         public async Task<ActionResult<IEnumerable<TicketDTO>>> CheckTicketAvailability(int eventId)
         {
+            if(_memoryCache.TryGetValue("availableTickets", out IEnumerable<TicketDTO>? ticketList))
+            {
+                return Ok(ticketList);
+            }
             var tickets = await _ticketService.CheckTicketAvailability(eventId);
+            _memoryCache.Set("availableTickets", tickets, TimeSpan.FromMinutes(3));
             return Ok(tickets);
         }
 
@@ -76,7 +101,6 @@ namespace EventSphere.Controllers
         {
             await _ticketService.UpdateTicket(ticketDto, id);
             return Ok();
-
         }
 
     }

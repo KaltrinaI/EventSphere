@@ -1,6 +1,7 @@
 ﻿using EventSphere.DTOs;
 using EventSphere.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace EventSphere.Controllers
 {
@@ -9,18 +10,24 @@ namespace EventSphere.Controllers
     public class OrganizerController : ControllerBase
     {
         private readonly IOrganizerService _organizerService;
+        private readonly IMemoryCache _memoryCache;
 
 
-        public OrganizerController(IOrganizerService organizerService)
+        public OrganizerController(IOrganizerService organizerService, IMemoryCache memoryCache)
         {
             _organizerService = organizerService;
+            _memoryCache= memoryCache;
 
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrganizerDTO>>> GetAllOrganizers()
         {
+            if(_memoryCache.TryGetValue("organizers", out IEnumerable<OrganizerDTO>? Allorganizers)) {
+                return Ok(Allorganizers);
+            }
             var organizers = await _organizerService.GetAllOrganizers();
+            _memoryCache.Set("organizers", organizers, TimeSpan.FromMinutes(10));
             return Ok(organizers);
         }
 
@@ -29,7 +36,12 @@ namespace EventSphere.Controllers
         {
             try
             {
+                if(_memoryCache.TryGetValue("organizerById", out OrganizerDTO? organizerById))
+                {
+                    return Ok(organizerById);
+                }
                 var organizer = await _organizerService.GetOrganizerById(id);
+                _memoryCache.Set("organizerById", organizer, TimeSpan.FromMinutes(10));
                 return Ok(organizer);
             }
             catch (KeyNotFoundException)
