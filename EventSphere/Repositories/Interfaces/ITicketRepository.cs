@@ -11,6 +11,5 @@ namespace EventSphere.Repositories.Interfaces
         Task UpdateTicket(TicketRequestDTO request, int ticketId);
         Task DeleteTicket(int ticketId);
         Task<IEnumerable<Ticket>> GetAvailableTickets(int eventId);
-        Task<decimal> CalculateTotalRevenueFromEvent(int eventId);
     }
 }

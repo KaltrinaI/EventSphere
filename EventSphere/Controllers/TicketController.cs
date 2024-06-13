@@ -1,5 +1,6 @@
 ﻿using EventSphere.DTOs;
 using EventSphere.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -18,6 +19,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet("{id}")]
+        //[AllowAnonymous]
         public async Task<ActionResult<TicketDTO>> GetTicketById(int id)
         {
             try
@@ -37,6 +39,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet("{eventId}")]
+        //[AllowAnonymous]
         public async Task<ActionResult<IEnumerable<TicketDTO>>> GetTicketsByEventId(int eventId)
         {
             if(_memoryCache.TryGetValue("ticketsByEvent", out IEnumerable<TicketDTO>? ticketList))
@@ -50,6 +53,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPost]
+        //[Authorize (Roles ="Admin,Organizer")]
         public async Task<ActionResult> AddTicket(TicketRequestDTO ticketDto)
         {
             await _ticketService.AddTicket(ticketDto);
@@ -57,6 +61,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpDelete("{id}")]
+        //[Authorize (Roles ="Admin,Organizer")]
         public async Task<ActionResult> DeleteTicket(int id)
         {
             await _ticketService.DeleteTicket(id);
@@ -64,6 +69,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet("{eventId}/available")]
+        //[AllowAnonymous]
         public async Task<ActionResult<IEnumerable<TicketDTO>>> CheckTicketAvailability(int eventId)
         {
             if(_memoryCache.TryGetValue("availableTickets", out IEnumerable<TicketDTO>? ticketList))
@@ -75,14 +81,8 @@ namespace EventSphere.Controllers
             return Ok(tickets);
         }
 
-        [HttpGet("{eventId}/revenue")]
-        public async Task<ActionResult<decimal>> CalculateRevenueForEvent(int eventId)
-        {
-            var revenue = await _ticketService.CalculateRevenueForEvent(eventId);
-            return Ok(revenue);
-        }
-
         [HttpPost("{id},{quantity}/sell")]
+        //[Authorize (Roles ="Admin,Organizer")]
         public async Task<ActionResult> SellTicket(int id, int quantity)
         {
             await _ticketService.SellTicket(id, quantity);
@@ -90,6 +90,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPost("{id},{quantity}/refund")]
+        //[Authorize (Roles ="Admin,Organizer")]
         public async Task<ActionResult> RefundTicket(int id, int quantity)
         {
             await _ticketService.RefundTicket(id, quantity);
@@ -97,6 +98,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPut("{id}")]
+        //[Authorize (Roles ="Admin,Organizer")]
         public async Task<ActionResult> UpdateTicket(int id, TicketRequestDTO ticketDto)
         {
             await _ticketService.UpdateTicket(ticketDto, id);

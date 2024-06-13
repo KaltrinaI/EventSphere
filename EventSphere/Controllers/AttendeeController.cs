@@ -19,6 +19,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet]
+        //[Authorize]
         public async Task<ActionResult<IEnumerable<AttendeeDTO>>> GetAllAttendees()
         {
             if (_memoryCache.TryGetValue("AllAttendees", out IEnumerable<AttendeeDTO>? attendees))
@@ -32,6 +33,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet("{id}")]
+        //[Authorize]
         public async Task<ActionResult<AttendeeDTO>> GetAttendeeById(int attendeeId)
         {
             if(_memoryCache.TryGetValue("attendee", out AttendeeDTO? attendee))
@@ -44,6 +46,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPost]
+        //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> AddAttendee(AttendeeDTO attendeeDto)
         {
             await _service.AddAttendee(attendeeDto);
@@ -51,12 +54,14 @@ namespace EventSphere.Controllers
         }
 
         [HttpDelete("{id}")]
+        //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> DeleteAttendee(int id)
         {
             await _service.DeleteAttendee(id);
             return Ok();
         }
         [HttpPut("{id}")]
+        //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> UpdateAttendee(AttendeeDTO attendeeDto, int id)
         {
             await _service.UpdateAttendee(attendeeDto ,id);
@@ -64,6 +69,7 @@ namespace EventSphere.Controllers
 
         }
         [HttpGet("{eventId}")]
+        //[Authorize]
         public async Task<ActionResult<IEnumerable<AttendeeDTO>>> GetAttendeesByEvent(int eventId)
         {
             if(_memoryCache.TryGetValue("attendeesByEvent", out IEnumerable<AttendeeDTO>? attendeeList))
