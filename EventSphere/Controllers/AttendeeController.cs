@@ -46,6 +46,10 @@ namespace EventSphere.Controllers
         [HttpPost]
         public async Task<ActionResult> AddAttendee(AttendeeDTO attendeeDto)
         {
+            if (attendeeDto == null)
+            {
+                throw new ArgumentNullException(nameof(attendeeDto));
+            }
             await _service.AddAttendee(attendeeDto);
             return Ok();
         }
@@ -53,14 +57,28 @@ namespace EventSphere.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAttendee(int id)
         {
-            await _service.DeleteAttendee(id);
-            return Ok();
+            try
+            {
+                await _service.DeleteAttendee(id);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateAttendee(AttendeeDTO attendeeDto, int id)
         {
-            await _service.UpdateAttendee(attendeeDto ,id);
-            return Ok();
+            try
+            {
+                await _service.UpdateAttendee(attendeeDto, id);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
 
         }
         [HttpGet("{eventId}")]

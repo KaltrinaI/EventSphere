@@ -50,6 +50,8 @@ namespace EventSphere.Services.Implementations
 
         public async Task UpdateOrganizer(OrganizerRequestDTO organizerDto, int organizerId)
         {
+            if (organizerDto == null) throw new ArgumentNullException(nameof(organizerDto));
+
             var existingOrganizer = await _organizerRepository.GetOrganizerById(organizerId);
             if (existingOrganizer == null)
             {
