@@ -53,6 +53,11 @@ namespace EventSphere.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateOrganizer(OrganizerRequestDTO organizerDto)
         {
+            if (organizerDto == null)
+            {
+                return BadRequest("OrganizerRequestDTO object is null");
+            }
+
             await _organizerService.CreateOrganizer(organizerDto);
             return Ok();
         }
@@ -60,17 +65,31 @@ namespace EventSphere.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateOrganizer(int id, OrganizerRequestDTO organizerDto)
         {
-            await _organizerService.UpdateOrganizer(organizerDto, id);
-            return Ok();
+            try
+            {
+                await _organizerService.UpdateOrganizer(organizerDto, id);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Organizer not found" });
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteOrganizer(int id)
         {
-
-            await _organizerService.DeleteOrganizer(id);
-            return Ok();
+            try
+            {
+                await _organizerService.DeleteOrganizer(id);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound(new { message = "Organizer not found" });
+            }
         }
+
 
     }
 }
