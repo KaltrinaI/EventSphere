@@ -49,6 +49,10 @@ namespace EventSphere.Controllers
         //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> AddAttendee(AttendeeDTO attendeeDto)
         {
+            if (attendeeDto == null)
+            {
+                throw new ArgumentNullException(nameof(attendeeDto));
+            }
             await _service.AddAttendee(attendeeDto);
             return Ok();
         }
@@ -57,15 +61,29 @@ namespace EventSphere.Controllers
         //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> DeleteAttendee(int id)
         {
-            await _service.DeleteAttendee(id);
-            return Ok();
+            try
+            {
+                await _service.DeleteAttendee(id);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
         [HttpPut("{id}")]
         //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> UpdateAttendee(AttendeeDTO attendeeDto, int id)
         {
-            await _service.UpdateAttendee(attendeeDto ,id);
-            return Ok();
+            try
+            {
+                await _service.UpdateAttendee(attendeeDto, id);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
 
         }
         [HttpGet("{eventId}")]

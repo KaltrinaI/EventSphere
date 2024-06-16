@@ -23,11 +23,12 @@ namespace EventSphere.Controllers
         //[AllowAnonymous]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetAllEvents()
         {
-            if(_memoryCache.TryGetValue("events",out IEnumerable<EventDTO>? events)) {
+            if (_memoryCache.TryGetValue("events", out IEnumerable<EventDTO>? events))
+            {
                 return Ok(events);
             }
             var response = await _service.GetAllEvents();
-            _memoryCache.Set("events",response, TimeSpan.FromMinutes(10));
+            _memoryCache.Set("events", response, TimeSpan.FromMinutes(10));
 
             return Ok(response);
         }
@@ -36,11 +37,12 @@ namespace EventSphere.Controllers
         //[AllowAnonymous]
         public async Task<ActionResult<EventDTO>> GetEventById(int eventid)
         {
-            if(_memoryCache.TryGetValue("eventById", out EventDTO? eventById)){
+            if (_memoryCache.TryGetValue("eventById", out EventDTO? eventById))
+            {
                 return Ok(eventById);
             }
             var events = await _service.GetEventById(eventid);
-            _memoryCache.Set("eventById",events,TimeSpan.FromMinutes(10));
+            _memoryCache.Set("eventById", events, TimeSpan.FromMinutes(10));
             return Ok(events);
         }
 
@@ -48,7 +50,8 @@ namespace EventSphere.Controllers
         //[AllowAnonymous]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetEventsByOrganizerId(int organizerId)
         {
-            if(_memoryCache.TryGetValue("eventsByOrganizer", out IEnumerable<EventDTO>? eventsByOrganizer)){
+            if (_memoryCache.TryGetValue("eventsByOrganizer", out IEnumerable<EventDTO>? eventsByOrganizer))
+            {
                 return Ok(eventsByOrganizer);
             }
             var response = await _service.GetEventsByOrganizerId(organizerId);
@@ -61,6 +64,11 @@ namespace EventSphere.Controllers
         //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> AddEvent(EventRequestDTO eventDto)
         {
+            if (eventDto == null)
+            {
+                return BadRequest("EventRequestDTO object is null");
+            }
+
             await _service.AddEvent(eventDto);
             return Ok();
         }
@@ -69,15 +77,30 @@ namespace EventSphere.Controllers
         //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> DeleteEvent(int id)
         {
-            await _service.DeleteEvent(id);
-            return Ok();
+            try
+            {
+                await _service.DeleteEvent(id);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+                
+            }
         }
         [HttpPut("{id}")]
         //[Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> UpdateEvent(EventRequestDTO eventDto, int eventId)
         {
-            await _service.UpdateEvent(eventDto, eventId);
-            return Ok();
+            try
+            {
+                await _service.UpdateEvent(eventDto, eventId);
+                return Ok();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
 
         }
 
@@ -85,7 +108,7 @@ namespace EventSphere.Controllers
         //[AllowAnonymous]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetUpcomingEventsSortedByPopularity()
         {
-            if(_memoryCache.TryGetValue("popularEvents", out IEnumerable<EventDTO>? upcomingEvents))
+            if (_memoryCache.TryGetValue("popularEvents", out IEnumerable<EventDTO>? upcomingEvents))
             {
                 return Ok(upcomingEvents);
             }
