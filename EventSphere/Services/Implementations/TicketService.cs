@@ -20,11 +20,6 @@ namespace EventSphere.Services.Implementations
             await _ticketRepository.AddTicket(request);
         }
 
-        public async Task<decimal> CalculateRevenueForEvent(int eventId)
-        {
-            return await _ticketRepository.CalculateTotalRevenueFromEvent(eventId);
-        }
-
         public async Task<IEnumerable<TicketDTO>> CheckTicketAvailability(int eventId)
         {
             var tickets = await _ticketRepository.GetAvailableTickets(eventId);

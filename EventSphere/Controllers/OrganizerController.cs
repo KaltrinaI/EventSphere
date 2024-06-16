@@ -21,6 +21,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet]
+        //[Authorize]
         public async Task<ActionResult<IEnumerable<OrganizerDTO>>> GetAllOrganizers()
         {
             if(_memoryCache.TryGetValue("organizers", out IEnumerable<OrganizerDTO>? Allorganizers)) {
@@ -32,6 +33,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet("{id}")]
+        //[Authorize]
         public async Task<ActionResult<OrganizerDTO>> GetOrganizerById(int id)
         {
             try
@@ -51,6 +53,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPost]
+        //[Authorize(Roles="Admin")]
         public async Task<ActionResult> CreateOrganizer(OrganizerRequestDTO organizerDto)
         {
             if (organizerDto == null)
@@ -63,6 +66,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPut("{id}")]
+        //[Authorize(Roles="Admin")]
         public async Task<ActionResult> UpdateOrganizer(int id, OrganizerRequestDTO organizerDto)
         {
             try
@@ -77,6 +81,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpDelete("{id}")]
+        //[Authorize(Roles="Admin")]
         public async Task<ActionResult> DeleteOrganizer(int id)
         {
             try

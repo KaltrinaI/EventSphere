@@ -26,13 +26,6 @@ namespace EventSphere.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<decimal> CalculateTotalRevenueFromEvent(int eventId)
-        {
-            return await _context.Tickets
-                             .Where(t => t.EventId == eventId)
-                             .SumAsync(t => t.Price * (t.QuantityAvailable - t.QuantityAvailable));
-        }
-
         public async Task DeleteTicket(int ticketId)
         {
             var ticket = await _context.Tickets.FindAsync(ticketId);
