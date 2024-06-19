@@ -13,24 +13,16 @@ namespace EventSphere.Controllers
     public class EventController : ControllerBase
     {
         private readonly IEventService _service;
-        private readonly IMemoryCache _memoryCache;
-        public EventController(IEventService service, IMemoryCache memoryCache)
+        public EventController(IEventService service)
         {
             _service = service;
-            _memoryCache = memoryCache;
         }
 
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetAllEvents()
         {
-            if (_memoryCache.TryGetValue("events", out IEnumerable<EventDTO>? events))
-            {
-                return Ok(events);
-            }
             var response = await _service.GetAllEvents();
-            _memoryCache.Set("events", response, TimeSpan.FromMinutes(10));
-
             return Ok(response);
         }
 
@@ -38,12 +30,7 @@ namespace EventSphere.Controllers
         [Authorize]
         public async Task<ActionResult<EventDTO>> GetEventById(int id)
         {
-            if (_memoryCache.TryGetValue("eventById", out EventDTO? eventById))
-            {
-                return Ok(eventById);
-            }
             var events = await _service.GetEventById(id);
-            _memoryCache.Set("eventById", events, TimeSpan.FromMinutes(10));
             return Ok(events);
         }
 
@@ -51,12 +38,8 @@ namespace EventSphere.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetEventsByOrganizerId(int organizerId)
         {
-            if (_memoryCache.TryGetValue("eventsByOrganizer", out IEnumerable<EventDTO>? eventsByOrganizer))
-            {
-                return Ok(eventsByOrganizer);
-            }
+
             var response = await _service.GetEventsByOrganizerId(organizerId);
-            _memoryCache.Set("eventsByOrganizer", response, TimeSpan.FromMinutes(10));
             return Ok(response);
 
         }
@@ -109,12 +92,7 @@ namespace EventSphere.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetUpcomingEventsSortedByPopularity()
         {
-            if (_memoryCache.TryGetValue("popularEvents", out IEnumerable<EventDTO>? upcomingEvents))
-            {
-                return Ok(upcomingEvents);
-            }
             var events = await _service.GetUpcomingEventsSortedByPopularity();
-            _memoryCache.Set("popularEvents", events, TimeSpan.FromMinutes(10));
             return Ok(events);
 
         }
