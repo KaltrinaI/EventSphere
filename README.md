@@ -84,10 +84,10 @@ EventSphere is a web-based event management system designed to facilitate the or
 - **DTOs/**: Contains Data Transfer Objects for handling data between the client and the server.
 - **Models/**: Contains the entity models that define the database schema.
 - **Services/**: Contains service classes that implement the business logic.
+- **Repositories/**: Provides a layer of abstraction between the application and data access logic.
 - **Data/**: Contains the database context and migration files.
 - **EventSphere.csproj**: The project file for the ASP.NET Core backend.
 - **Program.cs**: The entry point of the backend application.
-- **Startup.cs**: Contains the configuration for the ASP.NET Core application.
 
 ### Frontend
 
