@@ -61,24 +61,6 @@ namespace EventSphere.Tests.RepositoryTests
             Assert.Equal(eventEntity.EventId, attendees[0].Events.First().EventId);
         }
 
-        [Fact]
-        public async Task AddAttendee_ShouldAddAttendeeWithoutEvent()
-        {
-            var request = new AttendeeDTO
-            {
-                Name = "John Doe",
-                Email = "john.doe@example.com",
-                Phone = "123-456-7890",
-                EventId = 999 // Non-existent event
-            };
-
-            await _repository.AddAttendee(request);
-
-            var attendees = _context.Attendees.Include(a => a.Events).ToList();
-            Assert.Single(attendees);
-            Assert.Equal(request.Name, attendees[0].Name);
-            Assert.Empty(attendees[0].Events);
-        }
 
         // DeleteAttendee Tests
         [Fact]

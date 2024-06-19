@@ -1,14 +1,15 @@
 ﻿using EventSphere.DTOs;
 using EventSphere.Services.Implementations;
 using EventSphere.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Runtime.CompilerServices;
 
 namespace EventSphere.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class EventController : ControllerBase
     {
         private readonly IEventService _service;
@@ -20,7 +21,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet]
-        //[AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetAllEvents()
         {
             if (_memoryCache.TryGetValue("events", out IEnumerable<EventDTO>? events))
@@ -33,21 +34,21 @@ namespace EventSphere.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
-        //[AllowAnonymous]
-        public async Task<ActionResult<EventDTO>> GetEventById(int eventid)
+        [HttpGet("eventById/{id}")]
+        [Authorize]
+        public async Task<ActionResult<EventDTO>> GetEventById(int id)
         {
             if (_memoryCache.TryGetValue("eventById", out EventDTO? eventById))
             {
                 return Ok(eventById);
             }
-            var events = await _service.GetEventById(eventid);
+            var events = await _service.GetEventById(id);
             _memoryCache.Set("eventById", events, TimeSpan.FromMinutes(10));
             return Ok(events);
         }
 
-        [HttpGet("{organizerId}")]
-        //[AllowAnonymous]
+        [HttpGet("eventByOrganizer/{organizerId}")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetEventsByOrganizerId(int organizerId)
         {
             if (_memoryCache.TryGetValue("eventsByOrganizer", out IEnumerable<EventDTO>? eventsByOrganizer))
@@ -61,7 +62,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles="Admin,Organizer")]
+        [Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> AddEvent(EventRequestDTO eventDto)
         {
             if (eventDto == null)
@@ -74,7 +75,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles="Admin,Organizer")]
+        [Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> DeleteEvent(int id)
         {
             try
@@ -88,8 +89,8 @@ namespace EventSphere.Controllers
                 
             }
         }
-        [HttpPut("{id}")]
-        //[Authorize(Roles="Admin,Organizer")]
+        [HttpPut("{eventId}")]
+        [Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> UpdateEvent(EventRequestDTO eventDto, int eventId)
         {
             try
@@ -105,7 +106,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet("upcoming/popularity")]
-        //[AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<EventDTO>>> GetUpcomingEventsSortedByPopularity()
         {
             if (_memoryCache.TryGetValue("popularEvents", out IEnumerable<EventDTO>? upcomingEvents))

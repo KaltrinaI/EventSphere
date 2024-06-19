@@ -81,12 +81,12 @@ namespace EventSphere.Repositories.Implementations
 
         public async Task<IEnumerable<Event>> GetUpcomingEventsSortedByPopularity()
         {
-            var currentDate = DateTime.Now;
+            var currentDate = DateTime.UtcNow;
             return await _context.Events
                 .Include(e => e.Organizer)
                 .Include(e => e.Tickets)
                 .Where(e => e.StartDate > currentDate)
-                .OrderByDescending(e => e.Tickets.Count) // Assuming popularity is measured by the number of tickets
+                .OrderByDescending(e => e.Tickets.Count) 
                 .ToListAsync();
         }
     }
