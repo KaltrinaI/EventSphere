@@ -90,6 +90,7 @@ EventSphere/
 │   ├── package-lock.json
 │   └── README.md
 └── README.md
+```
 ## Setup and Installation
 
 ### Backend
