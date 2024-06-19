@@ -14,14 +14,12 @@ namespace EventSphere
     public class OrganizerControllerTests
     {
         private readonly Mock<IOrganizerService> _serviceMock;
-        private readonly Mock<IMemoryCache> _memoryCacheMock;
         private readonly OrganizerController _controller;
 
         public OrganizerControllerTests()
         {
             _serviceMock = new Mock<IOrganizerService>();
-            _memoryCacheMock = new Mock<IMemoryCache>();
-            _controller = new OrganizerController(_serviceMock.Object, _memoryCacheMock.Object);
+            _controller = new OrganizerController(_serviceMock.Object);
         }
 
         [Fact]
@@ -34,10 +32,7 @@ namespace EventSphere
                 new OrganizerDTO { OrganizerId = 2, Name = "Organizer 2" }
             };
 
-            object cacheEntry;
-            _memoryCacheMock.Setup(m => m.TryGetValue("organizers", out cacheEntry)).Returns(false);
             _serviceMock.Setup(s => s.GetAllOrganizers()).ReturnsAsync(organizers);
-            _memoryCacheMock.Setup(m => m.CreateEntry("organizers")).Returns(Mock.Of<ICacheEntry>());
 
             // Act
             var result = await _controller.GetAllOrganizers();
@@ -50,39 +45,13 @@ namespace EventSphere
         }
 
         [Fact]
-        public async Task GetAllOrganizers_ShouldReturnCachedOrganizers_WhenCacheExists()
-        {
-            // Arrange
-            var organizers = new List<OrganizerDTO>
-            {
-                new OrganizerDTO { OrganizerId = 1, Name = "Organizer 1" },
-                new OrganizerDTO { OrganizerId = 2, Name = "Organizer 2" }
-            };
-
-            object cacheEntry = organizers;
-            _memoryCacheMock.Setup(m => m.TryGetValue("organizers", out cacheEntry)).Returns(true);
-
-            // Act
-            var result = await _controller.GetAllOrganizers();
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<List<OrganizerDTO>>(okResult.Value);
-            Assert.Equal(2, returnValue.Count);
-            _serviceMock.Verify(s => s.GetAllOrganizers(), Times.Never);
-        }
-
-        [Fact]
         public async Task GetOrganizerById_ShouldReturnOkResult_WithOrganizer_WhenOrganizerExists()
         {
             // Arrange
             var organizerId = 1;
             var organizerDto = new OrganizerDTO { OrganizerId = organizerId, Name = "Organizer 1" };
 
-            object cacheEntry;
-            _memoryCacheMock.Setup(m => m.TryGetValue("organizerById", out cacheEntry)).Returns(false);
             _serviceMock.Setup(s => s.GetOrganizerById(organizerId)).ReturnsAsync(organizerDto);
-            _memoryCacheMock.Setup(m => m.CreateEntry("organizerById")).Returns(Mock.Of<ICacheEntry>());
 
             // Act
             var result = await _controller.GetOrganizerById(organizerId);
@@ -94,25 +63,6 @@ namespace EventSphere
             _serviceMock.Verify(s => s.GetOrganizerById(organizerId), Times.Once);
         }
 
-        [Fact]
-        public async Task GetOrganizerById_ShouldReturnCachedOrganizer_WhenCacheExists()
-        {
-            // Arrange
-            var organizerId = 1;
-            var organizerDto = new OrganizerDTO { OrganizerId = organizerId, Name = "Organizer 1" };
-
-            object cacheEntry = organizerDto;
-            _memoryCacheMock.Setup(m => m.TryGetValue("organizerById", out cacheEntry)).Returns(true);
-
-            // Act
-            var result = await _controller.GetOrganizerById(organizerId);
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<OrganizerDTO>(okResult.Value);
-            Assert.Equal(organizerId, returnValue.OrganizerId);
-            _serviceMock.Verify(s => s.GetOrganizerById(organizerId), Times.Never);
-        }
 
         [Fact]
         public async Task GetOrganizerById_ShouldReturnNotFound_WhenOrganizerDoesNotExist()

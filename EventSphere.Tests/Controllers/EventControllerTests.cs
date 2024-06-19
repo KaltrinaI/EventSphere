@@ -14,14 +14,12 @@ namespace EventSphere
     public class EventControllerTests
     {
         private readonly Mock<IEventService> _serviceMock;
-        private readonly Mock<IMemoryCache> _memoryCacheMock;
         private readonly EventController _controller;
 
         public EventControllerTests()
         {
             _serviceMock = new Mock<IEventService>();
-            _memoryCacheMock = new Mock<IMemoryCache>();
-            _controller = new EventController(_serviceMock.Object, _memoryCacheMock.Object);
+            _controller = new EventController(_serviceMock.Object);
         }
 
         [Fact]
@@ -34,10 +32,7 @@ namespace EventSphere
                 new EventDTO { EventId = 2, Name = "Event 2" }
             };
 
-            object cacheEntry;
-            _memoryCacheMock.Setup(m => m.TryGetValue("events", out cacheEntry)).Returns(false);
             _serviceMock.Setup(s => s.GetAllEvents()).ReturnsAsync(events);
-            _memoryCacheMock.Setup(m => m.CreateEntry("events")).Returns(Mock.Of<ICacheEntry>());
 
             // Act
             var result = await _controller.GetAllEvents();
@@ -50,39 +45,13 @@ namespace EventSphere
         }
 
         [Fact]
-        public async Task GetAllEvents_ShouldReturnCachedEvents_WhenCacheExists()
-        {
-            // Arrange
-            var events = new List<EventDTO>
-            {
-                new EventDTO { EventId = 1, Name = "Event 1" },
-                new EventDTO { EventId = 2, Name = "Event 2" }
-            };
-
-            object cacheEntry = events;
-            _memoryCacheMock.Setup(m => m.TryGetValue("events", out cacheEntry)).Returns(true);
-
-            // Act
-            var result = await _controller.GetAllEvents();
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<List<EventDTO>>(okResult.Value);
-            Assert.Equal(2, returnValue.Count);
-            _serviceMock.Verify(s => s.GetAllEvents(), Times.Never);
-        }
-
-        [Fact]
         public async Task GetEventById_ShouldReturnOkResult_WithEvent_WhenEventExists()
         {
             // Arrange
             var eventId = 1;
             var eventDto = new EventDTO { EventId = eventId, Name = "Event 1" };
 
-            object cacheEntry;
-            _memoryCacheMock.Setup(m => m.TryGetValue("eventById", out cacheEntry)).Returns(false);
             _serviceMock.Setup(s => s.GetEventById(eventId)).ReturnsAsync(eventDto);
-            _memoryCacheMock.Setup(m => m.CreateEntry("eventById")).Returns(Mock.Of<ICacheEntry>());
 
             // Act
             var result = await _controller.GetEventById(eventId);
@@ -93,27 +62,6 @@ namespace EventSphere
             Assert.Equal(eventId, returnValue.EventId);
             _serviceMock.Verify(s => s.GetEventById(eventId), Times.Once);
         }
-
-        [Fact]
-        public async Task GetEventById_ShouldReturnCachedEvent_WhenCacheExists()
-        {
-            // Arrange
-            var eventId = 1;
-            var eventDto = new EventDTO { EventId = eventId, Name = "Event 1" };
-
-            object cacheEntry = eventDto;
-            _memoryCacheMock.Setup(m => m.TryGetValue("eventById", out cacheEntry)).Returns(true);
-
-            // Act
-            var result = await _controller.GetEventById(eventId);
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<EventDTO>(okResult.Value);
-            Assert.Equal(eventId, returnValue.EventId);
-            _serviceMock.Verify(s => s.GetEventById(eventId), Times.Never);
-        }
-
 
 
         [Fact]
@@ -207,8 +155,6 @@ namespace EventSphere
             _serviceMock.Verify(s => s.UpdateEvent(eventDto, eventId), Times.Once);
         }
 
-
-
         [Fact]
         public async Task GetEventsByOrganizerId_ShouldReturnOkResult_WithListOfEvents()
         {
@@ -220,10 +166,7 @@ namespace EventSphere
                 new EventDTO { EventId = 2, Name = "Event 2" }
             };
 
-            object cacheEntry;
-            _memoryCacheMock.Setup(m => m.TryGetValue("eventsByOrganizer", out cacheEntry)).Returns(false);
             _serviceMock.Setup(s => s.GetEventsByOrganizerId(organizerId)).ReturnsAsync(events);
-            _memoryCacheMock.Setup(m => m.CreateEntry("eventsByOrganizer")).Returns(Mock.Of<ICacheEntry>());
 
             // Act
             var result = await _controller.GetEventsByOrganizerId(organizerId);
@@ -236,30 +179,6 @@ namespace EventSphere
         }
 
         [Fact]
-        public async Task GetEventsByOrganizerId_ShouldReturnCachedEvents_WhenCacheExists()
-        {
-            // Arrange
-            var organizerId = 1;
-            var events = new List<EventDTO>
-            {
-                new EventDTO { EventId = 1, Name = "Event 1" },
-                new EventDTO { EventId = 2, Name = "Event 2" }
-            };
-
-            object cacheEntry = events;
-            _memoryCacheMock.Setup(m => m.TryGetValue("eventsByOrganizer", out cacheEntry)).Returns(true);
-
-            // Act
-            var result = await _controller.GetEventsByOrganizerId(organizerId);
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<List<EventDTO>>(okResult.Value);
-            Assert.Equal(2, returnValue.Count);
-            _serviceMock.Verify(s => s.GetEventsByOrganizerId(organizerId), Times.Never);
-        }
-
-        [Fact]
         public async Task GetUpcomingEventsSortedByPopularity_ShouldReturnOkResult_WithListOfEvents()
         {
             // Arrange
@@ -269,10 +188,7 @@ namespace EventSphere
                 new EventDTO { EventId = 2, Name = "Event 2" }
             };
 
-            object cacheEntry;
-            _memoryCacheMock.Setup(m => m.TryGetValue("popularEvents", out cacheEntry)).Returns(false);
             _serviceMock.Setup(s => s.GetUpcomingEventsSortedByPopularity()).ReturnsAsync(events);
-            _memoryCacheMock.Setup(m => m.CreateEntry("popularEvents")).Returns(Mock.Of<ICacheEntry>());
 
             // Act
             var result = await _controller.GetUpcomingEventsSortedByPopularity();
@@ -282,29 +198,6 @@ namespace EventSphere
             var returnValue = Assert.IsType<List<EventDTO>>(okResult.Value);
             Assert.Equal(2, returnValue.Count);
             _serviceMock.Verify(s => s.GetUpcomingEventsSortedByPopularity(), Times.Once);
-        }
-
-        [Fact]
-        public async Task GetUpcomingEventsSortedByPopularity_ShouldReturnCachedEvents_WhenCacheExists()
-        {
-            // Arrange
-            var events = new List<EventDTO>
-            {
-                new EventDTO { EventId = 1, Name = "Event 1" },
-                new EventDTO { EventId = 2, Name = "Event 2" }
-            };
-
-            object cacheEntry = events;
-            _memoryCacheMock.Setup(m => m.TryGetValue("popularEvents", out cacheEntry)).Returns(true);
-
-            // Act
-            var result = await _controller.GetUpcomingEventsSortedByPopularity();
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<List<EventDTO>>(okResult.Value);
-            Assert.Equal(2, returnValue.Count);
-            _serviceMock.Verify(s => s.GetUpcomingEventsSortedByPopularity(), Times.Never);
         }
        
     }

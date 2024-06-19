@@ -14,14 +14,12 @@ namespace EventManagementTests
     public class TicketControllerTests
     {
         private readonly Mock<ITicketService> _serviceMock;
-        private readonly Mock<IMemoryCache> _memoryCacheMock;
         private readonly TicketController _controller;
 
         public TicketControllerTests()
         {
             _serviceMock = new Mock<ITicketService>();
-            _memoryCacheMock = new Mock<IMemoryCache>();
-            _controller = new TicketController(_serviceMock.Object, _memoryCacheMock.Object);
+            _controller = new TicketController(_serviceMock.Object);
         }
 
         [Fact]
@@ -31,10 +29,7 @@ namespace EventManagementTests
             var ticketId = 1;
             var ticketDto = new TicketDTO { TicketId = ticketId, Price = 100, TicketType = "VIP", QuantityAvailable = 50 };
 
-            object cacheEntry;
-            _memoryCacheMock.Setup(m => m.TryGetValue("ticketById", out cacheEntry)).Returns(false);
             _serviceMock.Setup(s => s.GetTicketById(ticketId)).ReturnsAsync(ticketDto);
-            _memoryCacheMock.Setup(m => m.CreateEntry("ticketById")).Returns(Mock.Of<ICacheEntry>());
 
             // Act
             var result = await _controller.GetTicketById(ticketId);
@@ -46,25 +41,6 @@ namespace EventManagementTests
             _serviceMock.Verify(s => s.GetTicketById(ticketId), Times.Once);
         }
 
-        [Fact]
-        public async Task GetTicketById_ShouldReturnCachedTicket_WhenCacheExists()
-        {
-            // Arrange
-            var ticketId = 1;
-            var ticketDto = new TicketDTO { TicketId = ticketId, Price = 100, TicketType = "VIP", QuantityAvailable = 50 };
-
-            object cacheEntry = ticketDto;
-            _memoryCacheMock.Setup(m => m.TryGetValue("ticketById", out cacheEntry)).Returns(true);
-
-            // Act
-            var result = await _controller.GetTicketById(ticketId);
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnValue = Assert.IsType<TicketDTO>(okResult.Value);
-            Assert.Equal(ticketId, returnValue.TicketId);
-            _serviceMock.Verify(s => s.GetTicketById(ticketId), Times.Never);
-        }
 
         [Fact]
         public async Task GetTicketById_ShouldReturnNotFound_WhenTicketDoesNotExist()
