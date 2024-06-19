@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventSphere.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;

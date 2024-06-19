@@ -20,26 +20,26 @@ namespace EventSphere.Repositories.Implementations
 
         public async Task AddAttendee(AttendeeDTO request)
         {
+            // Find the event by EventId
+            var eventEntity = await _context.Events.FindAsync(request.EventId);
+            if (eventEntity == null)
+            {
+                throw new Exception("Event not found");
+            }
+
+            // Create the attendee and add the event to the attendee's events list
             var attendee = new Attendee
             {
                 Name = request.Name,
                 Email = request.Email,
-                Phone = request.Phone
+                Phone = request.Phone,
+                Events = new List<Event> { eventEntity }
             };
-
-            var eventEntity = await _context.Events.FindAsync(request.EventId);
-            if (eventEntity != null)
-            {
-                if (attendee.Events == null)
-                {
-                    attendee.Events = new List<Event>();
-                }
-                attendee.Events.Add(eventEntity);
-            }
 
             _context.Attendees.Add(attendee);
             await _context.SaveChangesAsync();
         }
+
 
         public async Task DeleteAttendee(int attendeeId)
         {

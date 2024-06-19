@@ -1,6 +1,7 @@
 using EventSphere.Data;
 using EventSphere.Repositories.Implementations;
 using EventSphere.Repositories.Interfaces;
+using EventSphere.Services.AuthenticationService;
 using EventSphere.Services.Implementations;
 using EventSphere.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -50,6 +51,11 @@ builder.Services.AddScoped<IOrganizerRepository, OrganizerRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepostiory>();
 builder.Services.AddScoped<IOrganizerService, OrganizerService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IAttendeeRepository, AttendeeRepository>();
+builder.Services.AddScoped<IAttendeeService, AttendeeService>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<TokenService, TokenService>();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
@@ -76,6 +82,17 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -85,7 +102,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 

@@ -1,5 +1,6 @@
 ﻿using EventSphere.DTOs;
 using EventSphere.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -19,7 +20,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<AttendeeDTO>>> GetAllAttendees()
         {
             if (_memoryCache.TryGetValue("AllAttendees", out IEnumerable<AttendeeDTO>? attendees))
@@ -32,8 +33,8 @@ namespace EventSphere.Controllers
             return Ok(response);
         }
 
-        [HttpGet("{id}")]
-        //[Authorize]
+        [HttpGet("{attendeeId}")]
+        [Authorize]
         public async Task<ActionResult<AttendeeDTO>> GetAttendeeById(int attendeeId)
         {
             if(_memoryCache.TryGetValue("attendee", out AttendeeDTO? attendee))
@@ -46,7 +47,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles="Admin,Organizer")]
+        [Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> AddAttendee(AttendeeDTO attendeeDto)
         {
             if (attendeeDto == null)
@@ -58,7 +59,7 @@ namespace EventSphere.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles="Admin,Organizer")]
+        [Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> DeleteAttendee(int id)
         {
             try
@@ -72,7 +73,7 @@ namespace EventSphere.Controllers
             }
         }
         [HttpPut("{id}")]
-        //[Authorize(Roles="Admin,Organizer")]
+        [Authorize(Roles="Admin,Organizer")]
         public async Task<ActionResult> UpdateAttendee(AttendeeDTO attendeeDto, int id)
         {
             try
@@ -86,8 +87,8 @@ namespace EventSphere.Controllers
             }
 
         }
-        [HttpGet("{eventId}")]
-        //[Authorize]
+        [HttpGet("attendeesByEvent/{eventId}")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<AttendeeDTO>>> GetAttendeesByEvent(int eventId)
         {
             if(_memoryCache.TryGetValue("attendeesByEvent", out IEnumerable<AttendeeDTO>? attendeeList))
