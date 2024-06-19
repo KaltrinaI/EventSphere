@@ -4,7 +4,6 @@ EventSphere is a web-based event management system designed to facilitate the or
 
 ## Table of Contents
 
-- [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Setup and Installation](#setup-and-installation)
 - [Running the Project](#running-the-project)
@@ -19,78 +18,6 @@ EventSphere is a web-based event management system designed to facilitate the or
 - Node.js and npm
 - PostgreSQL
 
-## Project Structure
-
-```plaintext
-EventSphere/
-├── backend/
-│   ├── Controllers/
-│   │   ├── AttendeeController.cs
-│   │   ├── EventController.cs
-│   │   ├── OrganizerController.cs
-│   │   ├── TicketController.cs
-│   ├── DTOs/
-│   │   ├── AttendeeDTO.cs
-│   │   ├── EventDTO.cs
-│   │   ├── OrganizerDTO.cs
-│   │   ├── TicketDTO.cs
-│   ├── Models/
-│   │   ├── Attendee.cs
-│   │   ├── Event.cs
-│   │   ├── Organizer.cs
-│   │   ├── Ticket.cs
-│   ├── Services/
-│   │   ├── Implementations/
-│   │   ├── Interfaces/
-│   ├── Data/
-│   │   ├── AppDbContext.cs
-│   │   ├── Migrations/
-│   ├── EventSphere.csproj
-│   ├── Program.cs
-│   └── Startup.cs
-├── frontend/
-│   ├── public/
-│   │   ├── index.html
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Attendees/
-│   │   │   │   ├── AttendeeForm.js
-│   │   │   │   ├── AttendeeList.js
-│   │   │   │   ├── SearchAttendeeById.js
-│   │   │   │   ├── SearchAttendeeByEventId.js
-│   │   │   ├── Auth/
-│   │   │   │   ├── LoginForm.js
-│   │   │   │   ├── RegisterForm.js
-│   │   │   ├── Events/
-│   │   │   │   ├── EventForm.js
-│   │   │   │   ├── EventList.js
-│   │   │   │   ├── SearchEventById.js
-│   │   │   │   ├── SearchEventsByOrganizerId.js
-│   │   │   ├── Organizers/
-│   │   │   │   ├── OrganizerForm.js
-│   │   │   │   ├── OrganizerList.js
-│   │   │   │   ├── SearchOrganizerById.js
-│   │   │   ├── Tickets/
-│   │   │   │   ├── TicketForm.js
-│   │   │   │   ├── TicketList.js
-│   │   │   │   ├── SearchTicketById.js
-│   │   │   │   ├── SearchTicketsByEventId.js
-│   │   │   │   ├── SellTicketForm.js
-│   │   │   │   ├── RefundTicketForm.js
-│   │   ├── services/
-│   │   │   ├── attendeeService.js
-│   │   │   ├── authService.js
-│   │   │   ├── eventService.js
-│   │   │   ├── organizerService.js
-│   │   │   ├── ticketService.js
-│   │   ├── App.js
-│   │   ├── index.js
-│   │   ├── index.css
-│   ├── package.json
-│   ├── package-lock.json
-│   └── README.md
-└── README.md
-```
 ## Setup and Installation
 
 ### Backend
