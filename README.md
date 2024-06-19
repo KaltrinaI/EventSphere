@@ -13,39 +13,9 @@ EventSphere is a web-based event management system designed to facilitate the or
 - [Contributing](#contributing)
 - [License](#license)
 
-## Project Structure
-EventSphere/
-├── backend/
-│ ├── Controllers/
-│ ├── DTOs/
-│ ├── Models/
-│ ├── Services/
-│ ├── Data/
-│ ├── EventSphere.csproj
-│ ├── Program.cs
-│ └── Startup.cs
-├── frontend/
-│ ├── public/
-│ ├── src/
-│ │ ├── components/
-│ │ │ ├── Attendees/
-│ │ │ ├── Auth/
-│ │ │ ├── Events/
-│ │ │ ├── Organizers/
-│ │ │ ├── Tickets/
-│ │ ├── services/
-│ │ ├── App.js
-│ │ ├── index.js
-│ │ ├── index.css
-│ ├── package.json
-│ ├── package-lock.json
-│ └── README.md
-└── README.md
-
-
 ## Prerequisites
 
-- .NET 6 SDK
+- .NET 7 SDK
 - Node.js and npm
 - PostgreSQL
 
