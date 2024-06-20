@@ -30,3 +30,17 @@ export const getUsername = () => {
     const decoded = jwtDecode(token);
     return decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
 };
+
+// Function to add token to headers
+export const authHeader = () => {
+    const token = getToken();
+    if (token) {
+        return { Authorization: `Bearer ${token}` };
+    } else {
+        return {};
+    }
+};
+
+export const logout = () => {
+    localStorage.removeItem('token');
+};

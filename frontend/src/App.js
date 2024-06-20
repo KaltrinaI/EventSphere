@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, Paper, Box } from '@mui/material';
 import AttendeeList from './components/Attendees/AttendeeList';
@@ -17,10 +17,12 @@ import SellTicketForm from './components/Tickets/SellTicketForm';
 import RefundTicketForm from './components/Tickets/RefundTicketForm';
 import EventList from './components/Events/EventList';
 import EventForm from './components/Events/EventForm';
+import UpcomingEvents from './components/Events/UpcomingEvents'; 
 import SearchEventById from './components/Events/SearchEventById';
 import SearchEventsByOrganizerId from './components/Events/SearchEventsByOrganizerId';
 import LoginForm from './components/Auth/LoginForm';
 import RegisterForm from './components/Auth/RegisterForm';
+import { getToken, getUsername, logout } from './services/authService';
 
 function App() {
     const [selectedAttendee, setSelectedAttendee] = useState(null);
@@ -38,6 +40,15 @@ function App() {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [searchEventResult, setSearchEventResult] = useState(null);
     const [eventsByOrganizer, setEventsByOrganizer] = useState([]);
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const token = getToken();
+        if (token) {
+            setIsLoggedIn(true);
+        }
+    }, []);
 
     const handleEditAttendee = (attendee) => {
         setSelectedAttendee(attendee);
@@ -111,6 +122,7 @@ function App() {
                     <Typography variant="h6" style={{ flexGrow: 1 }}>
                         EventSphere
                     </Typography>
+                    {isLoggedIn && <>
                     <Button 
                         color="inherit"
                         component={NavLink}
@@ -155,8 +167,27 @@ function App() {
                     >
                         Events
                     </Button>
+                    </> }
                     <Box sx={{ flexGrow: 1 }} />
-                    <Button 
+                    {isLoggedIn ? <>
+
+                        <Typography>
+                            {getUsername()}
+                        </Typography>
+                        <Button onClick={()=>{logout();setIsLoggedIn(false)}}
+                        color="inherit"
+                        component={NavLink}
+                        to="/login"
+                        activeClassName="active"
+                        style={({ isActive }) => ({
+                            color: isActive ? '#ff69b4' : 'inherit',
+                        })}
+                    >
+                        logout
+                    </Button>
+                    
+                    </>:<>    
+                    <Button
                         color="inherit"
                         component={NavLink}
                         to="/login"
@@ -178,6 +209,7 @@ function App() {
                     >
                         Register
                     </Button>
+                </>}
                 </Toolbar>
             </AppBar>
             <Container>
@@ -267,7 +299,7 @@ function App() {
                                 )}
                             </>
                         } />
-                        <Route path="/login" element={<LoginForm />} />
+                        <Route path="/login" element={<LoginForm onLoginSucceed = {()=>setIsLoggedIn(true)} />} />
                         <Route path="/register" element={<RegisterForm />} />
                     </Routes>
                 </Paper>

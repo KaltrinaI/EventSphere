@@ -18,13 +18,23 @@ const AttendeeList = ({ attendees: initialAttendees, onEdit }) => {
     };
 
     const handleDelete = async (id) => {
-        await deleteAttendee(id);
+        const confirmDelete = window.confirm("Are you sure you want to delete this organizer?");
+        if(confirmDelete){
+            try{
+                await deleteAttendee(id);
         if (!initialAttendees) {
             fetchAttendees();
         } else {
             setAttendees(attendees.filter(att => att.attendeeId !== id));
         }
+            }catch (error) {
+                console.error('Error deleting organizer:', error);
+            }
+        }
+        
     };
+
+
 
     return (
         <TableContainer component={Paper}>

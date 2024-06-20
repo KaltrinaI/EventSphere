@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Container, Paper } from '@mui/material';
 import { login } from '../../services/authService';
 
-const LoginForm = ({ onLogin }) => {
+const LoginForm = ({onLoginSucceed}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -14,7 +14,9 @@ const LoginForm = ({ onLogin }) => {
         e.preventDefault();
         try {
             const response = await login(email, password);
-            onLogin(response.token, response.role);
+            if(!response.token)
+                throw new Error();
+            onLoginSucceed();
             navigate('/');
         } catch (err) {
             setError('Login failed. Please check your credentials.');

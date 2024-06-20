@@ -1,4 +1,3 @@
-// src/components/Tickets/TicketList.js
 import React, { useEffect, useState } from 'react';
 import { getTicketsByEventId, deleteTicket } from '../../services/ticketService';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';

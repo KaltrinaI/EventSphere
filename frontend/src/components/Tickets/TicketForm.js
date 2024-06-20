@@ -1,4 +1,3 @@
-// src/components/Tickets/TicketForm.js
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Paper } from '@mui/material';
 import { addTicket, updateTicket } from '../../services/ticketService';

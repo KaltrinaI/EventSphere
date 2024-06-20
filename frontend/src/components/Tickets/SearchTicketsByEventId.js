@@ -1,4 +1,3 @@
-// src/components/Tickets/SearchTicketsByEventId.js
 import React, { useState } from 'react';
 import { TextField, Button, Paper, Typography } from '@mui/material';
 import { getTicketsByEventId } from '../../services/ticketService';

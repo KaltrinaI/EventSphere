@@ -1,4 +1,3 @@
-// src/components/Tickets/SellTicketForm.js
 import React, { useState } from 'react';
 import { TextField, Button, Paper, Typography } from '@mui/material';
 import { sellTicket } from '../../services/ticketService';
